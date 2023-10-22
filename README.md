@@ -1,5 +1,5 @@
 # GenExVar
-as
+
 # Branch naming convention dla projektu
 
 ## Gałązie robocze
