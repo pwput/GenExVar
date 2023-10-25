@@ -12,10 +12,10 @@ export default function Gene(props:{gene : IGene} ) {
         alert(childData)
     }
 
-    const maxDataCount =
-        Number(props.gene.CNData.isData) +
-        Number(props.gene.EXPData.isData) +
-        Number(props.gene.mCGData.isData)
+    // const maxDataCount =
+    //     Number(props.gene.CNData.isData) +
+    //     Number(props.gene.EXPData.isData) +
+    //     Number(props.gene.mCGData.isData)
 
     const [isCNDataValue,setIsCNDataValue]=useState(false)
     const [isEXPDataValue,setIsEXPDataValue]=useState(false)
