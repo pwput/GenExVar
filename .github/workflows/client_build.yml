@@ -17,11 +17,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
-      - name: Go to client folder
-        run: cd ./client
       - name: Install dependencies
-        run: npm install
-      - name: Go to client folder
         run: cd ./client
+             npm install
       - name: Generate build
-        run: npm run build
+        run: cd ./client
+             npm run build
