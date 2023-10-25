@@ -1,3 +1,7 @@
+### develop status :
+- client [![tests](https://github.com/pwput/GenExVar/actions/workflows/client_tests.yml/badge.svg?branch=develop)](https://github.com/pwput/GenExVar/actions/workflows/client_tests.yml) [![build](https://github.com/pwput/GenExVar/actions/workflows/client_build.yml/badge.svg?branch=develop)](https://github.com/pwput/GenExVar/actions/workflows/client_build.yml)
+
+
 # GenExVar
 
 # Branch naming convention dla projektu
