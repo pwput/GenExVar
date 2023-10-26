@@ -1,0 +1,27 @@
+name: client_build
+
+on:
+  push:
+    branches:
+      - 'issue/**'
+      - 'develop'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Install dependencies
+        run: |
+            cd ./client
+            npm install
+      - name: Generate build
+        run: |
+            cd ./client
+            npm run build

@@ -1,0 +1,48 @@
+
+.top-charts-container{
+  display: flex;
+  flex-direction: row;
+}
+
+.top-chart{
+  width: calc((100vw /3));
+  aspect-ratio: 16/9;
+}
+
+.correlation-charts-container{
+  margin: 40px;
+  aspect-ratio: 16/9;
+}
+
+.bottom-charts-container{
+  display: flex;
+  flex-direction: row;
+}
+
+.bottom-chart{
+  width: calc((100vw /2));
+  aspect-ratio: 16/9;
+}
+
+@media screen and (max-width: 1200px) {
+  .top-charts-container {
+    flex-direction: column;
+    margin-bottom: 40px;
+  }
+  .bottom-charts-container{
+    flex-direction: column;
+    margin-bottom: 40px;
+  }
+
+  .top-chart{
+    width: calc(100vw - 80px);
+    aspect-ratio: 16/9;
+    margin: 40px;
+  }
+
+  .bottom-chart{
+    width: calc(100vw - 80px);
+    aspect-ratio: 16/9;
+    margin: 40px;
+  }
+}
