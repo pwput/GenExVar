@@ -66,7 +66,7 @@ export default function ScatterChart(props: TDottedChartProps) {
         },
         data: [{
             type: "scatter",
-            markerSize: 8,
+            markerSize: 6,
             toolTipContent: props.tooltipContent,
             dataPoints: props.dataPoints
         }]
