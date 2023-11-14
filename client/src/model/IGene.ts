@@ -7,7 +7,6 @@ export interface IGene{
     CNData: ICNData
     EXPData:IEXPData
     mCGData: ImCGData
-    WGCNAData: IWGCNAData
     sort: number
     covByHighConfCNVs: number
     covByLowConfCNVs: number
@@ -16,6 +15,7 @@ export interface IGene{
 export interface IData {
     x: number
     y: number
+    accessionID: number
     color?: string
 }
 
