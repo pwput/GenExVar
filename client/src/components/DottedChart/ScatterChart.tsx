@@ -25,6 +25,10 @@ export interface TDottedChartProps {
     clickableProps?: IClickableProps
 }
 
+const chartTitleFontSize = 36;
+const axisTitleFontSize = 24;
+const labelFontSize = 16;
+
 export default function ScatterChart(props: TDottedChartProps) {
     const isZoomEnabled = props.isZoomEnabled !== undefined ? props.isZoomEnabled : false
     const isClickable = props.clickableProps !== undefined ? props.clickableProps : false
@@ -45,10 +49,18 @@ export default function ScatterChart(props: TDottedChartProps) {
         theme: "light2",
         animationEnabled: true,
         zoomEnabled: isZoomEnabled,
+        legend:{
+            fontSize: labelFontSize,
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+        },
         title: {
+            titleFontSize: chartTitleFontSize,
             text: props.chartTitle
         },
         axisX: {
+            titleFontSize: axisTitleFontSize,
+            labelFontSize: labelFontSize,
             title: props.xAxisProps.name,
             suffix: props.xAxisProps.suffix,
             crosshair: {
@@ -57,6 +69,8 @@ export default function ScatterChart(props: TDottedChartProps) {
             }
         },
         axisY: {
+            titleFontSize: axisTitleFontSize,
+            labelFontSize: labelFontSize,
             title: props.yAxisProps.name,
             suffix: props.yAxisProps.suffix,
             crosshair: {
@@ -65,8 +79,10 @@ export default function ScatterChart(props: TDottedChartProps) {
             }
         },
         data: [{
+            color: "red",
+            showInLegend: true,
             type: "scatter",
-            markerSize: 6,
+            markerSize: 4,
             toolTipContent: props.tooltipContent,
             dataPoints: props.dataPoints
         }]

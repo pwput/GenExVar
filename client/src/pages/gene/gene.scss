@@ -1,48 +1,60 @@
+$correlationChartMargin: 180px;
+$chartAspectRatio: 16/9;
+$defaultChartMargin: 40px;
+$maxWidth: 1200px;
 
-.top-charts-container{
+.top-charts-container {
   display: flex;
   flex-direction: row;
 }
 
-.top-chart{
-  width: calc((100vw /3));
+.top-chart {
+  width: calc((100vw / 3));
   aspect-ratio: 16/9;
 }
 
-.correlation-charts-container{
-  margin: 40px;
-  aspect-ratio: 16/9;
+.correlation-charts-container {
+  width: calc(100vw - ($correlationChartMargin * 2));
+  aspect-ratio: $chartAspectRatio;
+  margin-left: $correlationChartMargin;
+  margin-right: $correlationChartMargin;
 }
 
-.bottom-charts-container{
+.bottom-charts-container {
   display: flex;
   flex-direction: row;
 }
 
-.bottom-chart{
-  width: calc((100vw /2));
-  aspect-ratio: 16/9;
+.bottom-chart {
+  width: calc((100vw / 2));
+  aspect-ratio: $chartAspectRatio;
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: $maxWidth) {
   .top-charts-container {
     flex-direction: column;
-    margin-bottom: 40px;
+    margin-bottom: $defaultChartMargin;
   }
-  .bottom-charts-container{
+  .bottom-charts-container {
     flex-direction: column;
-    margin-bottom: 40px;
+    margin-bottom: $defaultChartMargin;
   }
 
-  .top-chart{
-    width: calc(100vw - 80px);
-    aspect-ratio: 16/9;
-    margin: 40px;
+  .top-chart {
+    width: calc(100vw - ($defaultChartMargin * 2));
+    aspect-ratio: $chartAspectRatio;
+    margin: $defaultChartMargin;
   }
 
-  .bottom-chart{
-    width: calc(100vw - 80px);
-    aspect-ratio: 16/9;
-    margin: 40px;
+  .bottom-chart {
+    width: calc(100vw - ($defaultChartMargin * 2));
+    aspect-ratio: $chartAspectRatio;
+    margin: $defaultChartMargin;
+  }
+
+  .correlation-charts-container {
+    width: calc(100vw - ($defaultChartMargin * 2));
+    margin: $defaultChartMargin;
+    aspect-ratio: $chartAspectRatio;
   }
 }

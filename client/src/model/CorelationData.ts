@@ -1,0 +1,2 @@
+import {IData} from "./IGene";
+
