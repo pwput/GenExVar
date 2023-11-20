@@ -1,11 +1,11 @@
-export interface IGene{
+export interface IGene {
     geneId: string
     type: string
     chromosome: string
     start: number
     end: number
     CNData: ICNData
-    EXPData:IEXPData
+    EXPData: IEXPData
     mCGData: ImCGData
     sort: number
     covByHighConfCNVs: number
@@ -19,34 +19,39 @@ export interface IData {
     color?: string
 }
 
-interface IIsData {
+export interface IIsData {
     isData: boolean
     dataArray: IData[]
     type: ChartType
 }
 
-interface ICNData extends IIsData{}
-interface IEXPData extends IIsData{}
-interface ImCGData extends IIsData{}
+interface ICNData extends IIsData {
+}
 
-export enum ChartType{
+interface IEXPData extends IIsData {
+}
+
+interface ImCGData extends IIsData {
+}
+
+export enum ChartType {
     CN = "CN",
     EXP = "EXP",
     mCG = "mCG"
 }
 
-interface ChartAxisLabels{
+interface ChartAxisLabels {
     x: string
     y: string
 }
 
-const chartAxisLabels  = {
-    CN:  { x: "accessions", y: "copies" },
-    EXP: { x: "accessions", y: "TPM" },
-    mCG: { x: "accessions", y: "mCG ratio" }
+const chartAxisLabels = {
+    CN: {x: "accessions", y: "copies"},
+    EXP: {x: "accessions", y: "TPM"},
+    mCG: {x: "accessions", y: "mCG ratio"}
 };
 
-export function getChartTitle(data: IIsData): string{
+export function getChartTitle(data: IIsData): string {
     switch (data.type) {
         case ChartType.CN:
             return "Copy Number"
@@ -59,7 +64,7 @@ export function getChartTitle(data: IIsData): string{
     }
 }
 
-export function getChartAxisLabels(data: IIsData): ChartAxisLabels{
+export function getChartAxisLabels(data: IIsData): ChartAxisLabels {
     switch (data.type) {
         case ChartType.CN:
             return chartAxisLabels.CN
@@ -72,57 +77,6 @@ export function getChartAxisLabels(data: IIsData): ChartAxisLabels{
     }
 }
 
-export class CorrelationData{
-    xData: IIsData | null = null
-    yData: IIsData | null = null
-
-    constructor() {
-        this.xData = null;
-        this.yData = null;
-    }
-
-    getTitle(): string{
-        if(this.xData && this.yData){
-            return `Correlation between ${getChartTitle(this.xData)} and ${getChartTitle(this.yData)}`
-        }
-        return ""
-    }
-
-    getXAxisTitle(): string {
-        if (this.xData && this.yData) {
-            return getChartAxisLabels(this.xData).x
-        }
-        return ""
-    }
-    getYAxisTitle(): string{
-        if (this.xData && this.yData) {
-            return getChartAxisLabels(this.yData).y
-        }
-        return ""
-    }
-
-    setData( data: IIsData){
-        if (this.xData === null){
-            this.xData = data
-            return
-        }
-
-        if (this.yData === null){
-            this.yData = data
-            return
-        }
-
-        if(this.xData?.type === data.type){
-            this.xData = null
-            return
-        }
-
-        if(this.yData?.type === data.type){
-            this.yData = null
-            return
-        }
-    }
-}
 
 
 

@@ -4,7 +4,7 @@ import ScatterChart from "../../components/DottedChart/ScatterChart";
 import BoxChart from "../../components/BoxPlot/BoxChart"
 import {Divider} from "@mui/material";
 import './gene.scss'
-import {ChartType, CorrelationData, IData, IGene} from "../../model/IGene";
+import {ChartType, getChartAxisLabels, getChartTitle, IData, IGene, IIsData} from "../../model/IGene";
 
 
 export default function Gene(props: { gene: IGene }) {
@@ -12,48 +12,24 @@ export default function Gene(props: { gene: IGene }) {
         alert(childData)
     }
 
-    const [isCNDataValue, setIsCNDataValue] = useState(false)
-    const [isEXPDataValue, setIsEXPDataValue] = useState(false)
-    const [ismCGDataValue, setIsmCGDataValue] = useState(false)
+    const [correlationxData, setcorrelationxData] =
+        useState<IIsData | null>(null)
+    const [correlationyData, setcorrelationyData] =
+        useState<IIsData | null>(null)
 
-    const [correlationData, setCorrelationData] =
-        useState<CorrelationData>(new CorrelationData())
+    const correlationData = setPlotData(correlationxData?.dataArray, correlationyData?.dataArray)
 
+    const correlationTitle = getTitle(correlationxData, correlationyData)
 
-    function canSelectPlot() {
-        const nowSelectedCount =
-            Number(isCNDataValue) +
-            Number(isEXPDataValue) +
-            Number(ismCGDataValue)
-        return nowSelectedCount < 2
-    }
+    const correlationXAxisTitle = getYAxisTitle(correlationxData)
 
-    function isCorrelationPlotVisible() {
-        const nowSelectedCount =
-            Number(isCNDataValue) +
-            Number(isEXPDataValue) +
-            Number(ismCGDataValue)
-        return nowSelectedCount == 2
-    }
+    const correlationYAxisTitle = getYAxisTitle(correlationyData)
 
-    function getCorrelationTitle() {
-        let title = "";
-        if (isCNDataValue) title += "cn"
-        if (isEXPDataValue) title += "exp"
-        if (ismCGDataValue) title += "mcg"
-        return title
-    }
+    const canSetData = correlationxData === null || correlationyData === null
 
-    function getCorrelation() {
-        let xData: IData[], yData: IData[];
-        if (isCNDataValue) {
-            xData = props.gene.CNData.dataArray
-            if (isEXPDataValue) yData = props.gene.EXPData.dataArray
-            else yData = props.gene.mCGData.dataArray
-        }else {
-            xData = props.gene.EXPData.dataArray
-            yData = props.gene.mCGData.dataArray
-        }
+    function setPlotData(xData: IData[] | undefined, yData: IData[] | undefined): IData[] {
+        if (xData === undefined || yData === undefined)
+            return []
         const outData: IData[] = [];
         for (let i = 0; i < xData.length; i++) {
             let pap = yData.find(d => d.accessionID == xData[i].accessionID)
@@ -65,34 +41,68 @@ export default function Gene(props: { gene: IGene }) {
         return outData
     }
 
+    function getTitle(xD: IIsData | null, yD: IIsData | null): string {
+        if (xD && yD) {
+            return `Correlation between ${getChartTitle(xD)} and ${getChartTitle(yD)}`
+        }
+        return ""
+    }
+
+    function getYAxisTitle(data: IIsData | null): string {
+        if (data)
+            return getChartAxisLabels(data).y
+        return ""
+    }
+
+    const setData = (data: IIsData) => {
+        if (correlationxData === null && correlationyData?.type !== data.type) {
+            setcorrelationxData(data)
+            return
+        }
+        if (correlationxData?.type !== data.type && correlationyData === null) {
+            setcorrelationyData(data)
+            return
+        }
+        if (correlationxData?.type === data.type) {
+            setcorrelationxData(null)
+            return
+        }
+        if (correlationyData?.type === data.type) {
+            setcorrelationyData(null)
+            return
+        }
+    }
+
+
     return <div className={"container"}>
         <Search topText={topText} options={geneIds} label={"Locus ID"} buttonText={"Show Chart"}
                 parentCallback={handleSearchCallback}/>
         <Divider variant="middle"/>
         <div className={"top-charts-container"}>
-            <div className={"top-chart"}>
+            <div className={"top-chart"} onClick={() => setData(props.gene.CNData)}>
                 <ScatterChart
                     isZoomEnabled={true}
-                    clickableProps={{parentCallback: setIsCNDataValue, checkIfCanBeSelected: canSelectPlot}}
+                    clickableProps={{canBeSelected: canSetData}}
                     tooltipContent={"accession: {accessionID}, copies: {y}"}
                     dataPoints={props.gene.CNData.dataArray}
                     chartTitle={"Copy number"}
                     xAxisProps={{name: "accesions", suffix: ""}}
                     yAxisProps={{name: "copies", suffix: ""}}/>
             </div>
-            <div className={"top-chart"}>
+            <div className={"top-chart"} onClick={() => setData(props.gene.EXPData)}>
                 <ScatterChart
                     isZoomEnabled={true}
-                    clickableProps={{parentCallback: setIsEXPDataValue, checkIfCanBeSelected: canSelectPlot}}
+                    clickableProps={{canBeSelected: canSetData}}
                     tooltipContent={"accession: {accessionID}, TPM: {y}"}
                     dataPoints={props.gene.EXPData.dataArray}
                     chartTitle={"Expression"}
                     xAxisProps={{name: "accesions", suffix: ""}}
                     yAxisProps={{name: "TPM", suffix: ""}}/>
             </div>
-            <div className={"top-chart"}>
+            <div className={"top-chart"} onClick={() => setData(props.gene.mCGData)}>
                 <ScatterChart
-                    clickableProps={{parentCallback: setIsmCGDataValue, checkIfCanBeSelected: canSelectPlot}}
+                    isZoomEnabled={true}
+                    clickableProps={{canBeSelected: canSetData}}
                     tooltipContent={"accession: {accessionID}, mCG ratio: {y}"}
                     dataPoints={props.gene.mCGData.dataArray}
                     chartTitle={"Methylation"}
@@ -101,16 +111,18 @@ export default function Gene(props: { gene: IGene }) {
             </div>
         </div>
         <Divider variant="middle"/>
-        { isCorrelationPlotVisible() &&
-        <div className={"correlation-charts-container"}>
+        {!canSetData && <div className={"correlation-charts-container"}>
             <ScatterChart
                 isZoomEnabled={true}
                 plotContainerHeight={"100%"}
                 tooltipContent={"x: {x}, y: {y}"}
-                dataPoints={getCorrelation()}
-                chartTitle={getCorrelationTitle()}
-                xAxisProps={{name: "xname", suffix: ""}}
-                yAxisProps={{name: "yName", suffix: ""}}/>
+                dataPoints={correlationData}
+                chartTitle={correlationTitle}
+                xAxisProps={{name: correlationXAxisTitle, suffix: ""}}
+                yAxisProps={{name: correlationYAxisTitle, suffix: ""}}/>
+        </div>}
+        {canSetData && <div className={"correlation-charts-container-message"}>
+            <p>Select two from the above charts to see the correlation between them.</p>
         </div>}
         <Divider variant="middle"/>
         <div className={"bottom-charts-container"}>
