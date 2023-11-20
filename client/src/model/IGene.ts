@@ -76,9 +76,3 @@ export function getChartAxisLabels(data: IIsData): ChartAxisLabels {
             return {x: "", y: ""}
     }
 }
-
-
-
-
-
-

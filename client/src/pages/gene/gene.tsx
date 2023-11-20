@@ -4,7 +4,7 @@ import ScatterChart from "../../components/DottedChart/ScatterChart";
 import BoxChart from "../../components/BoxPlot/BoxChart"
 import {Divider} from "@mui/material";
 import './gene.scss'
-import {ChartType, getChartAxisLabels, getChartTitle, IData, IGene, IIsData} from "../../model/IGene";
+import {getChartAxisLabels, getChartTitle, IData, IGene, IIsData} from "../../model/IGene";
 
 
 export default function Gene(props: { gene: IGene }) {
@@ -32,8 +32,8 @@ export default function Gene(props: { gene: IGene }) {
             return []
         const outData: IData[] = [];
         for (let i = 0; i < xData.length; i++) {
-            let pap = yData.find(d => d.accessionID == xData[i].accessionID)
-            if (pap != undefined) {
+            let pap = yData.find(d => d.accessionID === xData[i].accessionID)
+            if (pap !== undefined) {
                 let out: IData = {x: pap.y, y: xData[i].y, accessionID: xData[i].accessionID, color: xData[i].color};
                 outData.push(out)
             }
