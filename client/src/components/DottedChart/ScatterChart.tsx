@@ -2,7 +2,7 @@ import React from 'react';
 import "./ScatterChart.scss"
 // @ts-ignore
 import CanvasJSReact from '@canvasjs/react-charts';
-import {IData} from "../../model/IGene";
+import { IData} from "../../model/IGene";
 
 export interface IAxisProps {
     name: string,
@@ -10,8 +10,7 @@ export interface IAxisProps {
 }
 
 export interface IClickableProps {
-    parentCallback: (data: boolean) => void
-    checkIfCanBeSelected: () => boolean
+    canBeSelected: boolean
 }
 
 export interface TDottedChartProps {
@@ -25,6 +24,10 @@ export interface TDottedChartProps {
     clickableProps?: IClickableProps
 }
 
+const chartTitleFontSize = 36;
+const axisTitleFontSize = 24;
+const labelFontSize = 16;
+
 export default function ScatterChart(props: TDottedChartProps) {
     const isZoomEnabled = props.isZoomEnabled !== undefined ? props.isZoomEnabled : false
     const isClickable = props.clickableProps !== undefined ? props.clickableProps : false
@@ -32,12 +35,11 @@ export default function ScatterChart(props: TDottedChartProps) {
 
     const [state, setState] = React.useState(false)
 
-    const handleDivClick = (event: any) => {
+    const handleDivClick = () => {
         if (props.clickableProps !== undefined) {
-            if (!state && !props.clickableProps.checkIfCanBeSelected())
+            if (!state && !props.clickableProps.canBeSelected)
                 return
             setState(!state)
-            props.clickableProps.parentCallback(!state)
         }
     }
 
@@ -45,10 +47,18 @@ export default function ScatterChart(props: TDottedChartProps) {
         theme: "light2",
         animationEnabled: true,
         zoomEnabled: isZoomEnabled,
+        legend:{
+            fontSize: labelFontSize,
+            horizontalAlign: "center", // left, center ,right
+            verticalAlign: "bottom",  // top, center, bottom
+        },
         title: {
+            titleFontSize: chartTitleFontSize,
             text: props.chartTitle
         },
         axisX: {
+            titleFontSize: axisTitleFontSize,
+            labelFontSize: labelFontSize,
             title: props.xAxisProps.name,
             suffix: props.xAxisProps.suffix,
             crosshair: {
@@ -57,6 +67,8 @@ export default function ScatterChart(props: TDottedChartProps) {
             }
         },
         axisY: {
+            titleFontSize: axisTitleFontSize,
+            labelFontSize: labelFontSize,
             title: props.yAxisProps.name,
             suffix: props.yAxisProps.suffix,
             crosshair: {
@@ -65,8 +77,10 @@ export default function ScatterChart(props: TDottedChartProps) {
             }
         },
         data: [{
+            color: "red",
+            showInLegend: true,
             type: "scatter",
-            markerSize: 6,
+            markerSize: 4,
             toolTipContent: props.tooltipContent,
             dataPoints: props.dataPoints
         }]
@@ -80,7 +94,7 @@ export default function ScatterChart(props: TDottedChartProps) {
         <div
             style={{borderColor: state ? "blue" : "lightgrey"}}
             className={"chart-container"}
-            onClick={isClickable ? handleDivClick : ((any) => {
+            onClick={isClickable ? handleDivClick : (() => {
             })}>
             <CanvasJSReact.CanvasJSChart containerProps={containerProps} options={options}/>
         </div>
