@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/gene/static/css/main.aba5bcf3.css",
+    "main.js": "/gene/static/js/main.e3e7da8c.js",
+    "static/js/787.cd7d7d7f.chunk.js": "/gene/static/js/787.cd7d7d7f.chunk.js",
+    "index.html": "/gene/index.html",
+    "main.aba5bcf3.css.map": "/gene/static/css/main.aba5bcf3.css.map",
+    "main.e3e7da8c.js.map": "/gene/static/js/main.e3e7da8c.js.map",
+    "787.cd7d7d7f.chunk.js.map": "/gene/static/js/787.cd7d7d7f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.aba5bcf3.css",
+    "static/js/main.e3e7da8c.js"
+  ]
+}
