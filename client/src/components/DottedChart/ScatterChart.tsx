@@ -1,8 +1,8 @@
-import React, {SetStateAction} from 'react';
+import React from 'react';
 import "./ScatterChart.scss"
 // @ts-ignore
 import CanvasJSReact from '@canvasjs/react-charts';
-import { IData, IIsData} from "../../model/IGene";
+import { IData} from "../../model/IGene";
 
 export interface IAxisProps {
     name: string,
@@ -35,7 +35,7 @@ export default function ScatterChart(props: TDottedChartProps) {
 
     const [state, setState] = React.useState(false)
 
-    const handleDivClick = (event: any) => {
+    const handleDivClick = () => {
         if (props.clickableProps !== undefined) {
             if (!state && !props.clickableProps.canBeSelected)
                 return
@@ -94,7 +94,7 @@ export default function ScatterChart(props: TDottedChartProps) {
         <div
             style={{borderColor: state ? "blue" : "lightgrey"}}
             className={"chart-container"}
-            onClick={isClickable ? handleDivClick : ((any) => {
+            onClick={isClickable ? handleDivClick : (() => {
             })}>
             <CanvasJSReact.CanvasJSChart containerProps={containerProps} options={options}/>
         </div>
