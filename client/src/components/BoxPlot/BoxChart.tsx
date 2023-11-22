@@ -1,12 +1,12 @@
 import "./BoxChart.scss"
 // @ts-ignore
 import CanvasJSReact from '@canvasjs/react-charts';
-import {IBoxDataPoints} from "../../model/IBoxDataPoints";
+import {BoxDataPoints} from "../../model/BoxDataPoints";
 
 
 export default function BoxChart(props: {
     chartTitle: string,
-    dataPoints: IBoxDataPoints,
+    dataPoints: BoxDataPoints,
     xAxisName: string, yAxisName: string,
     plotContainerHeight: string,
     yValueFormatString: string,
@@ -22,17 +22,15 @@ export default function BoxChart(props: {
             title: props.yAxisName,
         },
         axisX: {
-            title: props.xAxisName
+            title: props.xAxisName,
+            maximum: 7,
+            interval: 2
         },
         data: [
             {
+                //[Minimum, Q1, Q3, Maximum, Q2]
                 type: "boxAndWhisker",
-                dataPoints: [
-                    props.dataPoints.getBoxPlotData(props.dataPoints.x0, "0"),
-                    props.dataPoints.getBoxPlotData(props.dataPoints.x2, "2"),
-                    props.dataPoints.getBoxPlotData(props.dataPoints.x4, "4"),
-                    props.dataPoints.getBoxPlotData(props.dataPoints.x6, "6+"),
-                ]
+                dataPoints: props.dataPoints.getBoxPlotData()
             },
             {
                 type: "scatter",
