@@ -1,7 +1,7 @@
 {
   "name": "untitled",
   "version": "alpha",
-  "homepage": "https://pwput.github.io/gene",
+  "homepage": "https://pwput.github.io/GenExVar",
   "private": true,
   "dependencies": {
     "@canvasjs/react-charts": "^1.0.0",
@@ -21,6 +21,7 @@
     "react-router-dom": "^6.14.1",
     "react-scripts": "5.0.1",
     "sass": "^1.63.6",
+    "simple-statistics": "^7.8.3",
     "ts-jest": "^29.1.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
