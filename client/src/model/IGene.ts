@@ -30,6 +30,7 @@ interface IDataWithLegend  {
     showInLegend: boolean
     name: string
     legendText: string
+    toolTipContent: string | null,
     color: string
     dataPoints: IDataPoint[]
 }
@@ -45,7 +46,7 @@ export function groupByColor(data: IData[]): Record<string, IDataPoint[]> {
     }, {} as Record<string, IData[]>)
 }
 
-export function getDataWithLegend(data: IData[]): IDataWithLegend[] {
+export function getDataWithLegend(data: IData[],toolTipContent: string | null): IDataWithLegend[] {
     const groupedData = groupByColor(data)
     return Object.keys(groupedData).map(key => {
         return {
@@ -53,6 +54,8 @@ export function getDataWithLegend(data: IData[]): IDataWithLegend[] {
             showInLegend: true,
             name: key,
             legendText: getNameToColor(key),
+            toolTipContent: toolTipContent,
+            markerSize: 4,
             color: key,
             dataPoints: groupedData[key]
         }

@@ -2,7 +2,7 @@ import React from 'react';
 import "./ScatterChart.scss"
 // @ts-ignore
 import CanvasJSReact from '@canvasjs/react-charts';
-import { IData} from "../../model/IGene";
+import {getDataWithLegend, IData} from "../../model/IGene";
 
 export interface IAxisProps {
     name: string,
@@ -49,7 +49,7 @@ export default function ScatterChart(props: TDottedChartProps) {
         zoomEnabled: isZoomEnabled,
         legend:{
             fontSize: labelFontSize,
-            horizontalAlign: "center", // left, center ,right
+            horizontalAlign: "right", // left, center ,right
             verticalAlign: "bottom",  // top, center, bottom
         },
         title: {
@@ -76,14 +76,7 @@ export default function ScatterChart(props: TDottedChartProps) {
                 snapToDataPoint: true
             }
         },
-        data: [{
-            color: "red",
-            showInLegend: true,
-            type: "scatter",
-            markerSize: 4,
-            toolTipContent: props.tooltipContent,
-            dataPoints: props.dataPoints
-        }]
+        data:  getDataWithLegend(props.dataPoints, props.tooltipContent)
     }
 
     const containerProps = {

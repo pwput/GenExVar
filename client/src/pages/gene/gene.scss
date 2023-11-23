@@ -1,11 +1,13 @@
 $correlationChartMargin: 180px;
 $chartAspectRatio: 16/9;
 $defaultChartMargin: 40px;
+$tinyChartMargin: 40px;
 $maxWidth: 1200px;
-
+@supports (display: flex){
 .top-charts-container {
   display: flex;
   flex-direction: row;
+  margin-bottom: $defaultChartMargin;
 }
 
 .top-chart {
@@ -57,4 +59,4 @@ $maxWidth: 1200px;
     margin: $defaultChartMargin;
     aspect-ratio: $chartAspectRatio;
   }
-}
+}}

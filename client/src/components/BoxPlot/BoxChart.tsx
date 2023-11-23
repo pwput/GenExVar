@@ -30,7 +30,8 @@ export default function BoxChart(props: {
             {
                 //[Minimum, Q1, Q3, Maximum, Q2]
                 type: "boxAndWhisker",
-                dataPoints: props.dataPoints.getBoxPlotData()
+                dataPoints: props.dataPoints.getBoxPlotData(),
+
             },
             {
                 type: "scatter",
