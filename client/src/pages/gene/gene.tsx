@@ -5,7 +5,21 @@ import BoxChart from "../../components/BoxPlot/BoxChart"
 import {Divider} from "@mui/material";
 import './gene.scss'
 import {getChartAxisLabels, getChartTitle, IData, IGene, IIsData} from "../../model/IGene";
+import {BoxDataPoints} from "../../model/BoxDataPoints";
 
+export function getDataForCommonAccessions(xData: IData[] | undefined, yData: IData[] | undefined): IData[] {
+    if (xData === undefined || yData === undefined)
+        return []
+    const outData: IData[] = [];
+    for (let i = 0; i < xData.length; i++) {
+        let pap = yData.find(d => d.accessionID === xData[i].accessionID)
+        if (pap !== undefined) {
+            let out: IData = {x: pap.y, y: xData[i].y, accessionID: xData[i].accessionID, color: xData[i].color};
+            outData.push(out)
+        }
+    }
+    return outData
+}
 
 export default function Gene(props: { gene: IGene }) {
     const handleSearchCallback = (childData: string) => {
@@ -17,7 +31,7 @@ export default function Gene(props: { gene: IGene }) {
     const [correlationyData, setcorrelationyData] =
         useState<IIsData | null>(null)
 
-    const correlationData = setPlotData(correlationxData?.dataArray, correlationyData?.dataArray)
+    const correlationData = getDataForCommonAccessions(correlationxData?.dataArray, correlationyData?.dataArray)
 
     const correlationTitle = getTitle(correlationxData, correlationyData)
 
@@ -27,19 +41,8 @@ export default function Gene(props: { gene: IGene }) {
 
     const canSetData = correlationxData === null || correlationyData === null
 
-    function setPlotData(xData: IData[] | undefined, yData: IData[] | undefined): IData[] {
-        if (xData === undefined || yData === undefined)
-            return []
-        const outData: IData[] = [];
-        for (let i = 0; i < xData.length; i++) {
-            let pap = yData.find(d => d.accessionID === xData[i].accessionID)
-            if (pap !== undefined) {
-                let out: IData = {x: pap.y, y: xData[i].y, accessionID: xData[i].accessionID, color: xData[i].color};
-                outData.push(out)
-            }
-        }
-        return outData
-    }
+    const CNVvsmCGBoxPlot = new BoxDataPoints(props.gene.CNData.dataArray, props.gene.mCGData.dataArray)
+    const CNVvEXPBoxPlot = new BoxDataPoints(props.gene.CNData.dataArray, props.gene.EXPData.dataArray)
 
     function getTitle(xD: IIsData | null, yD: IIsData | null): string {
         if (xD && yD) {
@@ -128,19 +131,19 @@ export default function Gene(props: { gene: IGene }) {
         <div className={"bottom-charts-container"}>
             <div className={"bottom-chart"}>
                 <BoxChart
-                    dataPoints={dataPoints}
+                    dataPoints={ CNVvsmCGBoxPlot }
                     plotContainerHeight={'100%'}
                     chartTitle={"CNV vs mCG"}
-                    xAxisName={"CNV"}
+                    xAxisName={"copy number group"}
                     yAxisName={"mCG"}
                     yValueFormatString={"#,##0.#"}/>
             </div>
             <div className={"bottom-chart"}>
                 <BoxChart
-                    dataPoints={dataPoints}
+                    dataPoints={ CNVvEXPBoxPlot }
                     plotContainerHeight={'100%'}
                     chartTitle={"CNV vs EXP"}
-                    xAxisName={"CNV"}
+                    xAxisName={"copy number group"}
                     yAxisName={"EXP"}
                     yValueFormatString={"#,##0.#"}/>
             </div>
@@ -148,16 +151,6 @@ export default function Gene(props: { gene: IGene }) {
         <Divider variant="middle"/>
     </div>
 }
-
-
-const dataPoints = [
-    {label: "Bread", y: [179, 256, 300, 418, 274]},
-    {label: "Cake", y: [252, 346, 409, 437, 374.5]},
-    {label: "Biscuit", y: [236, 281.5, 336.5, 428, 313]},
-    {label: "Doughnut", y: [340, 382, 430, 452, 417]},
-    {label: "Pancakes", y: [194, 224.5, 342, 384, 251]},
-    {label: "Bagels", y: [241, 255, 276.5, 294, 274.5]}
-]
 
 const geneIds = [
     "AT1G01010",

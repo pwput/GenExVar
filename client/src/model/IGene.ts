@@ -16,7 +16,80 @@ export interface IData {
     x: number
     y: number
     accessionID: number
-    color?: string
+    color: string
+}
+
+export interface IDataPoint {
+    x: number
+    y: number
+    accessionID: number
+}
+
+interface IDataWithLegend  {
+    type: string
+    showInLegend: boolean
+    name: string
+    legendText: string
+    color: string
+    dataPoints: IDataPoint[]
+}
+
+
+export function groupByColor(data: IData[]): Record<string, IDataPoint[]> {
+    return data.reduce((acc: Record<string, IData[]>, curr: IData) => {
+        if (acc[curr.color] === undefined) {
+            acc[curr.color] = []
+        }
+        acc[curr.color].push(curr)
+        return acc
+    }, {} as Record<string, IData[]>)
+}
+
+export function getDataWithLegend(data: IData[]): IDataWithLegend[] {
+    const groupedData = groupByColor(data)
+    return Object.keys(groupedData).map(key => {
+        return {
+            type: "scatter",
+            showInLegend: true,
+            name: key,
+            legendText: getNameToColor(key),
+            color: key,
+            dataPoints: groupedData[key]
+        }
+    })
+
+}
+
+function getNameToColor(color:string):string{
+    switch (color) {
+        case "black":
+            return "Relicts"
+        case "PaleVioletRed":
+            return "Spain"
+        case "darkblue":
+            return "North Sweden"
+        case "lightblue":
+            return "South Sweden"
+        case "yellow":
+            return "Western Europe"
+        case "orange":
+            return "Central Europe"
+        case "purple":
+            return "Italy/Balkan/Caucasus"
+        case "darkred":
+            return "Asia"
+        case "darkgrey":
+            return "Admixed"
+        case "lightgreen":
+            return "USA (Germany)"
+        case "darkgreen":
+            return "Germany"
+        case "lightgrey":
+            return "Germany"
+        default:
+            return "not Implemented"
+    }
+
 }
 
 export interface IIsData {
