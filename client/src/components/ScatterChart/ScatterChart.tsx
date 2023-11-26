@@ -2,22 +2,23 @@ import React from 'react';
 import "./ScatterChart.scss"
 // @ts-ignore
 import CanvasJSReact from '@canvasjs/react-charts';
-import {getDataWithLegend, IData} from "../../model/IGene";
+import {DataPointColored} from "../../domain/DataPointColored";
+import {getDataWithLegend} from "../../domain/ChartDataWithLegend";
 
-export interface IAxisProps {
-    name: string,
+export type AxisProps = {
+    name: string
     suffix: string
 }
 
-export interface IClickableProps {
+export type IClickableProps = {
     canBeSelected: boolean
 }
 
-export interface TDottedChartProps {
+export type ScatterChartProps = {
     chartTitle: string,
-    dataPoints: IData[],
-    xAxisProps: IAxisProps,
-    yAxisProps: IAxisProps,
+    dataPoints: DataPointColored[],
+    xAxisProps: AxisProps,
+    yAxisProps: AxisProps,
     tooltipContent: string,
     plotContainerHeight?: string,
     isZoomEnabled?: boolean
@@ -28,7 +29,7 @@ const chartTitleFontSize = 36;
 const axisTitleFontSize = 24;
 const labelFontSize = 16;
 
-export default function ScatterChart(props: TDottedChartProps) {
+export default function ScatterChart(props: ScatterChartProps) {
     const isZoomEnabled = props.isZoomEnabled !== undefined ? props.isZoomEnabled : false
     const isClickable = props.clickableProps !== undefined ? props.clickableProps : false
     const plotContainerHeight = props.plotContainerHeight !== undefined ? props.plotContainerHeight : '100%'
@@ -53,7 +54,7 @@ export default function ScatterChart(props: TDottedChartProps) {
             verticalAlign: "bottom",  // top, center, bottom
         },
         title: {
-            titleFontSize: chartTitleFontSize,
+            fontSize: chartTitleFontSize,
             text: props.chartTitle
         },
         axisX: {

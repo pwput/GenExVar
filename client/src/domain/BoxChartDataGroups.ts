@@ -1,20 +1,10 @@
 import {quantile, min, max} from "simple-statistics";
-import {IData} from "./IGene";
+import {DataGroup} from "./BoxChartDataGroup";
+import {DataPointColored} from "./DataPointColored";
 
 const minGroupSize = 5
 
-class DataGroup {
-    constructor(label: string) {
-        this.group = []
-        this.label = label
-    }
-
-    group: number[] = []
-    label: string = ""
-}
-
-
-export class BoxDataPoints {
+export class BoxChartDataGroups {
     x0 = new DataGroup("0")
     x2 = new DataGroup("2")
     x4 = new DataGroup("4")
@@ -22,7 +12,7 @@ export class BoxDataPoints {
 
     groups = [this.x0, this.x2, this.x4, this.x6]
 
-    constructor(xData: IData[] | undefined, yData: IData[] | undefined) {
+    constructor(xData: DataPointColored[] | undefined, yData: DataPointColored[] | undefined) {
         const common = this.getDataForCommonAccessions(xData, yData)
         for (let i = 0; i < common.length; i++) {
             if (common[i].x < 1) {
@@ -37,14 +27,14 @@ export class BoxDataPoints {
         }
     }
 
-    private  getDataForCommonAccessions(xData: IData[] | undefined, yData: IData[] | undefined): IData[] {
+    private  getDataForCommonAccessions(xData: DataPointColored[] | undefined, yData: DataPointColored[] | undefined): DataPointColored[] {
         if (xData === undefined || yData === undefined)
             return []
-        const outData: IData[] = [];
+        const outData: DataPointColored[] = [];
         for (let i = 0; i < xData.length; i++) {
             let pap = yData.find(d => d.accessionID === xData[i].accessionID)
             if (pap !== undefined) {
-                let out: IData = {x: xData[i].y, y: pap.y, accessionID: xData[i].accessionID, color: xData[i].color};
+                let out: DataPointColored = {x: xData[i].y, y: pap.y, accessionID: xData[i].accessionID, color: xData[i].color};
                 outData.push(out)
             }
         }

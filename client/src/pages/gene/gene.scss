@@ -1,28 +1,41 @@
 $correlationChartMargin: 180px;
 $chartAspectRatio: 16/9;
 $defaultChartMargin: 40px;
-$tinyChartMargin: 40px;
+$tinyChartMargin: 20px;
 $maxWidth: 1200px;
-@supports (display: flex){
+
+.spinner-container{
+  margin:$defaultChartMargin;
+}
+
+.correlation-charts-container-message{
+  margin: $defaultChartMargin;
+}
+
+.correlation-text{
+  text-align: center;
+}
+
 .top-charts-container {
+  padding : $tinyChartMargin 0 $tinyChartMargin $tinyChartMargin;
   display: flex;
   flex-direction: row;
-  margin-bottom: $defaultChartMargin;
 }
 
 .top-chart {
   width: calc((100vw / 3));
   aspect-ratio: 16/9;
+  margin: 0 $tinyChartMargin 0 0;
 }
 
 .correlation-charts-container {
   width: calc(100vw - ($correlationChartMargin * 2));
   aspect-ratio: $chartAspectRatio;
-  margin-left: $correlationChartMargin;
-  margin-right: $correlationChartMargin;
+  margin: $defaultChartMargin $correlationChartMargin $defaultChartMargin $correlationChartMargin;
 }
 
 .bottom-charts-container {
+  padding : $tinyChartMargin 0 $tinyChartMargin $tinyChartMargin;
   display: flex;
   flex-direction: row;
 }
@@ -30,33 +43,36 @@ $maxWidth: 1200px;
 .bottom-chart {
   width: calc((100vw / 2));
   aspect-ratio: $chartAspectRatio;
+  margin: 0 $tinyChartMargin 0 0;
 }
 
 @media screen and (max-width: $maxWidth) {
   .top-charts-container {
     flex-direction: column;
-    margin-bottom: $defaultChartMargin;
+    margin: 0;
+    padding : $tinyChartMargin $tinyChartMargin 0 $tinyChartMargin;
   }
   .bottom-charts-container {
     flex-direction: column;
-    margin-bottom: $defaultChartMargin;
+    margin: 0;
+    padding : $tinyChartMargin $tinyChartMargin 0 $tinyChartMargin;
   }
 
   .top-chart {
     width: calc(100vw - ($defaultChartMargin * 2));
     aspect-ratio: $chartAspectRatio;
-    margin: $defaultChartMargin;
+    margin: 0 0 $defaultChartMargin 0;
   }
 
   .bottom-chart {
     width: calc(100vw - ($defaultChartMargin * 2));
     aspect-ratio: $chartAspectRatio;
-    margin: $defaultChartMargin;
+    margin: 0 0 $defaultChartMargin 0;
   }
 
   .correlation-charts-container {
     width: calc(100vw - ($defaultChartMargin * 2));
-    margin: $defaultChartMargin;
+    margin: $tinyChartMargin;
     aspect-ratio: $chartAspectRatio;
   }
-}}
+}

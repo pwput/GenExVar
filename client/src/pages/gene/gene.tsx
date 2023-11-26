@@ -1,20 +1,23 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Search from "../../components/Search/Search"
-import ScatterChart from "../../components/DottedChart/ScatterChart";
-import BoxChart from "../../components/BoxPlot/BoxChart"
-import {Divider} from "@mui/material";
+import ScatterChart from "../../components/ScatterChart/ScatterChart";
+import BoxChart from "../../components/BoxChart/BoxChart"
+import {CircularProgress, Divider} from "@mui/material";
 import './gene.scss'
-import {getChartAxisLabels, getChartTitle, IData, IGene, IIsData} from "../../model/IGene";
-import {BoxDataPoints} from "../../model/BoxDataPoints";
+import {ChartType, IGene, IIsData} from "../../model/IGene";
+import {BoxChartDataGroups} from "../../domain/BoxChartDataGroups";
+import {DataPointColored} from "../../domain/DataPointColored";
+import {getGene, getGeneIdList} from "../../api/api";
+import {CorrelationData} from "../../domain/CorrelationData";
 
-export function getDataForCommonAccessions(xData: IData[] | undefined, yData: IData[] | undefined): IData[] {
+export function getDataForCommonAccessions(xData: DataPointColored[] | undefined, yData: DataPointColored[] | undefined): DataPointColored[] {
     if (xData === undefined || yData === undefined)
         return []
-    const outData: IData[] = [];
+    const outData: DataPointColored[] = [];
     for (let i = 0; i < xData.length; i++) {
         let pap = yData.find(d => d.accessionID === xData[i].accessionID)
         if (pap !== undefined) {
-            let out: IData = {x: pap.y, y: xData[i].y, accessionID: xData[i].accessionID, color: xData[i].color};
+            let out: DataPointColored = {x: pap.y, y: xData[i].y, accessionID: xData[i].accessionID, color: xData[i].color};
             outData.push(out)
         }
     }
@@ -23,138 +26,145 @@ export function getDataForCommonAccessions(xData: IData[] | undefined, yData: ID
 
 export default function Gene(props: { gene: IGene }) {
     const handleSearchCallback = (childData: string) => {
-        alert(childData)
+        setGeneID(childData)
     }
 
-    const [correlationxData, setcorrelationxData] =
-        useState<IIsData | null>(null)
-    const [correlationyData, setcorrelationyData] =
-        useState<IIsData | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const firstUpdate = useRef(true);
 
-    const correlationData = getDataForCommonAccessions(correlationxData?.dataArray, correlationyData?.dataArray)
+    const [searchOptions, setSearchOptions] = useState<string[]>([])
+    const [geneID, setGeneID] = useState<string>("")
+    const [gene, setGene] = useState<IGene>(props.gene)
 
-    const correlationTitle = getTitle(correlationxData, correlationyData)
+    useEffect(() => {
+        getGeneIdList().then((res) => {
+            const geneIds = res.map(s => s.geneId)
+            setSearchOptions(geneIds)
+            console.log("Gene", "getGeneIdList() = ", geneIds)
+        })
+    }, [])
 
-    const correlationXAxisTitle = getYAxisTitle(correlationxData)
-
-    const correlationYAxisTitle = getYAxisTitle(correlationyData)
-
-    const canSetData = correlationxData === null || correlationyData === null
-
-    const CNVvsmCGBoxPlot = new BoxDataPoints(props.gene.CNData.dataArray, props.gene.mCGData.dataArray)
-    const CNVvEXPBoxPlot = new BoxDataPoints(props.gene.CNData.dataArray, props.gene.EXPData.dataArray)
-
-    function getTitle(xD: IIsData | null, yD: IIsData | null): string {
-        if (xD && yD) {
-            return `Correlation between ${getChartTitle(xD)} and ${getChartTitle(yD)}`
+    useEffect(() => {
+        if (firstUpdate.current) {
+            firstUpdate.current = false;
+            return;
         }
-        return ""
+        setIsLoading(true);
+        getGene(geneID).then((res) => {
+            let gene : IGene= res
+            gene.EXPData.type = ChartType.EXP
+            gene.CNData.type = ChartType.CN
+            gene.mCGData.type = ChartType.mCG
+            setGene(gene)
+            setCorrelationData(new CorrelationData(null, null))
+            console.log("Gene", "getGene() = ", res)
+        }).finally(() => {
+            setIsLoading(false);
+        });
+    }, [geneID])
+
+
+    const [correlationData, setCorrelationData] =
+        useState<CorrelationData>(new CorrelationData(null, null));
+
+    const CNVvsmCGBoxPlot = () => {
+        if (gene.CNData.isData && gene.mCGData.isData)
+            return new BoxChartDataGroups(gene.CNData.dataArray, gene.mCGData.dataArray)
+    }
+    const CNVvEXPBoxPlot = () => {
+        if (gene.CNData.isData && gene.EXPData.isData)
+            return new BoxChartDataGroups(gene.CNData.dataArray, gene.EXPData.dataArray)
     }
 
-    function getYAxisTitle(data: IIsData | null): string {
-        if (data)
-            return getChartAxisLabels(data).y
-        return ""
-    }
-
-    const setData = (data: IIsData) => {
-        if (correlationxData === null && correlationyData?.type !== data.type) {
-            setcorrelationxData(data)
-            return
-        }
-        if (correlationxData?.type !== data.type && correlationyData === null) {
-            setcorrelationyData(data)
-            return
-        }
-        if (correlationxData?.type === data.type) {
-            setcorrelationxData(null)
-            return
-        }
-        if (correlationyData?.type === data.type) {
-            setcorrelationyData(null)
-            return
-        }
-    }
-
+    const updateCorrelationData = (newData: IIsData) => {
+        setCorrelationData(correlationData => correlationData.setData(newData));
+    };
 
     return <div className={"container"}>
-        <Search topText={topText} options={geneIds} label={"Locus ID"} buttonText={"Show Chart"}
+        <Search topText={topText} options={searchOptions} label={"Locus ID"} buttonText={"Show Chart"}
                 parentCallback={handleSearchCallback}/>
         <Divider variant="middle"/>
-        <div className={"top-charts-container"}>
-            <div className={"top-chart"} onClick={() => setData(props.gene.CNData)}>
-                <ScatterChart
-                    isZoomEnabled={true}
-                    clickableProps={{canBeSelected: canSetData}}
-                    tooltipContent={"accession: {accessionID}, copies: {y}"}
-                    dataPoints={props.gene.CNData.dataArray}
-                    chartTitle={"Copy number"}
-                    xAxisProps={{name: "accesions", suffix: ""}}
-                    yAxisProps={{name: "copies", suffix: ""}}/>
-            </div>
-            <div className={"top-chart"} onClick={() => setData(props.gene.EXPData)}>
-                <ScatterChart
-                    isZoomEnabled={true}
-                    clickableProps={{canBeSelected: canSetData}}
-                    tooltipContent={"accession: {accessionID}, TPM: {y}"}
-                    dataPoints={props.gene.EXPData.dataArray}
-                    chartTitle={"Expression"}
-                    xAxisProps={{name: "accesions", suffix: ""}}
-                    yAxisProps={{name: "TPM", suffix: ""}}/>
-            </div>
-            <div className={"top-chart"} onClick={() => setData(props.gene.mCGData)}>
-                <ScatterChart
-                    isZoomEnabled={true}
-                    clickableProps={{canBeSelected: canSetData}}
-                    tooltipContent={"accession: {accessionID}, mCG ratio: {y}"}
-                    dataPoints={props.gene.mCGData.dataArray}
-                    chartTitle={"Methylation"}
-                    xAxisProps={{name: "accesions", suffix: ""}}
-                    yAxisProps={{name: "mCG ratio", suffix: ""}}/>
-            </div>
-        </div>
-        <Divider variant="middle"/>
-        {!canSetData && <div className={"correlation-charts-container"}>
-            <ScatterChart
-                isZoomEnabled={true}
-                plotContainerHeight={"100%"}
-                tooltipContent={"x: {x}, y: {y}"}
-                dataPoints={correlationData}
-                chartTitle={correlationTitle}
-                xAxisProps={{name: correlationXAxisTitle, suffix: ""}}
-                yAxisProps={{name: correlationYAxisTitle, suffix: ""}}/>
-        </div>}
-        {canSetData && <div className={"correlation-charts-container-message"}>
-            <p>Select two from the above charts to see the correlation between them.</p>
-        </div>}
-        <Divider variant="middle"/>
-        <div className={"bottom-charts-container"}>
-            <div className={"bottom-chart"}>
-                <BoxChart
-                    dataPoints={ CNVvsmCGBoxPlot }
-                    plotContainerHeight={'100%'}
-                    chartTitle={"CNV vs mCG"}
-                    xAxisName={"copy number group"}
-                    yAxisName={"mCG"}
-                    yValueFormatString={"#,##0.#"}/>
-            </div>
-            <div className={"bottom-chart"}>
-                <BoxChart
-                    dataPoints={ CNVvEXPBoxPlot }
-                    plotContainerHeight={'100%'}
-                    chartTitle={"CNV vs EXP"}
-                    xAxisName={"copy number group"}
-                    yAxisName={"EXP"}
-                    yValueFormatString={"#,##0.#"}/>
-            </div>
-        </div>
+        {isLoading &&
+            <div className="spinner-container"><CircularProgress /></div>}
+        {!isLoading &&
+            <div className={"content"}>
+                <div className={"top-charts-container"}>
+                    {gene.CNData.isData &&
+                        <div className={"top-chart"} onClick={() => updateCorrelationData(gene.CNData)}>
+                            <ScatterChart
+                                isZoomEnabled={true}
+                                clickableProps={{canBeSelected: correlationData.canSetData()}}
+                                tooltipContent={"accession: {accessionID}, copies: {y}"}
+                                dataPoints={gene.CNData.dataArray}
+                                chartTitle={"Copy number"}
+                                xAxisProps={{name: "accesions", suffix: ""}}
+                                yAxisProps={{name: "copies", suffix: ""}}/>
+                        </div>}
+                    {gene.EXPData.isData &&
+                        <div className={"top-chart"} onClick={() => updateCorrelationData(gene.EXPData)}>
+                            <ScatterChart
+                                isZoomEnabled={true}
+                                clickableProps={{canBeSelected: correlationData.canSetData()}}
+                                tooltipContent={"accession: {accessionID}, TPM: {y}"}
+                                dataPoints={gene.EXPData.dataArray}
+                                chartTitle={"Expression"}
+                                xAxisProps={{name: "accesions", suffix: ""}}
+                                yAxisProps={{name: "TPM", suffix: ""}}/>
+                        </div>}
+                    {gene.mCGData.isData &&
+                        <div className={"top-chart"} onClick={() => updateCorrelationData(gene.mCGData)}>
+                            <ScatterChart
+                                isZoomEnabled={true}
+                                clickableProps={{canBeSelected: correlationData.canSetData()}}
+                                tooltipContent={"accession: {accessionID}, mCG ratio: {y}"}
+                                dataPoints={gene.mCGData.dataArray}
+                                chartTitle={"Methylation"}
+                                xAxisProps={{name: "accesions", suffix: ""}}
+                                yAxisProps={{name: "mCG ratio", suffix: ""}}/>
+                        </div>}
+                </div>
+                <Divider variant="middle"/>
+                {!correlationData.canSetData() && <div className={"correlation-charts-container"}>
+                    <ScatterChart
+                        isZoomEnabled={true}
+                        plotContainerHeight={"100%"}
+                        tooltipContent={"x: {x}, y: {y}"}
+                        dataPoints={correlationData.getPlotData()}
+                        chartTitle={correlationData.getTitle()}
+                        xAxisProps={{name: correlationData.getAxisTitleX(), suffix: ""}}
+                        yAxisProps={{name: correlationData.getAxisTitleY(), suffix: ""}}/>
+                </div>}
+                {correlationData.canSetData() && <div className={"correlation-charts-container-message"}>
+                    <p className={"correlation-text"}>Select two from the above charts to see the correlation between them.</p>
+                </div>}
+                <Divider variant="middle"/>
+                <div className={"bottom-charts-container"}>
+                    {gene.CNData.isData && gene.mCGData.isData &&
+                        <div className={"bottom-chart"}>
+                            <BoxChart
+                                dataPoints={CNVvsmCGBoxPlot()}
+                                plotContainerHeight={'100%'}
+                                chartTitle={"CNV vs mCG"}
+                                xAxisName={"copy number group"}
+                                yAxisName={"mCG"}
+                                yValueFormatString={"#,##0.#"}/>
+                        </div>}
+                    {gene.CNData.isData && gene.EXPData.isData &&
+                        <div className={"bottom-chart"}>
+                            <BoxChart
+                                dataPoints={CNVvEXPBoxPlot()}
+                                plotContainerHeight={'100%'}
+                                chartTitle={"CNV vs EXP"}
+                                xAxisName={"copy number group"}
+                                yAxisName={"EXP"}
+                                yValueFormatString={"#,##0.#"}/>
+                        </div>
+                    }
+                </div>
+            </div>}
         <Divider variant="middle"/>
     </div>
 }
 
-const geneIds = [
-    "AT1G01010",
-    "AT1G01020",
-];
 
 const topText = "Enter valid gene locus ID (Araport 11 annotation; use capital letters) e.g. AT1G02250";
